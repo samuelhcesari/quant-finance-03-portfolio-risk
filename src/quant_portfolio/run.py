@@ -46,14 +46,16 @@ def part01(w: World, cfg: dict) -> dict:
     rets = {k: bt.run(bt.equal_weight((f == 1) & tradable), R)[0] for k, f in flags.items()}
     active = {k: r - bench for k, r in rets.items()}
     gap = active["naive"] - active["pit"]
-    lag = (m.filed - m.period_end_date).dt.days
-    events = sg.event_study(m, R.sub(R.mean(axis=1), axis=0))
+    max_lag = cfg["backtest"]["max_direct_filing_lag_days"]
+    lag = m.filing_lag[m.filing_lag <= max_lag]              # dépôts directs ; au-delà : comparatif d'un 10-K ultérieur
+    events = sg.event_study(m, R.sub(R.mean(axis=1), axis=0), max_lag=max_lag)
     known = flags["pit"].notna() & flags["naive"].notna()
     return dict(
         metrics=m, rebalance=reb, tradable=tradable, bench=bench, flags=flags, rets=rets, active=active, events=events, lag=lag,
         scalars=dict(
             firm_years=int(len(m)), quality_share=float(m.quality.mean()),
             filing_lag_days=dict(median=float(lag.median()), p10=float(lag.quantile(0.1)), p90=float(lag.quantile(0.9))),
+            share_known_only_from_later_filing=float((m.filing_lag > max_lag).mean()),
             decisions_using_unpublished_info=float((flags["pit"] != flags["naive"])[known].sum().sum() / known.sum().sum()),
             active_return=dict(naive=float(active["naive"].mean() * bt.ANN), pit=float(active["pit"].mean() * bt.ANN)),
             look_ahead_bias=dict(per_year=float(gap.mean() * bt.ANN), t_stat=_tstat(gap)),

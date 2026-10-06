@@ -32,6 +32,8 @@ Une métrique manquante fait échouer la règle (`allow_null: false`).
 
 **Chaîne temporelle complète** : dépôt le jour J -> signal utilisable à J+1 -> pris en compte au rebalancement de fin de mois -> premier rendement encaissé le lendemain du rebalancement.
 
+**Comparatifs tardifs.** Sur EDGAR, certains exercices anciens n'existent en XBRL que comme colonnes comparatives d'un 10-K ultérieur ; leur date de dépôt est alors celle de ce 10-K. Ils restent utilisables (la date est bien celle où la donnée structurée devient disponible), mais ne peuvent jamais remplacer un exercice plus récent déjà connu, et sont exclus de l'étude d'événement (`max_direct_filing_lag_days`).
+
 **Limite connue.** Les résultats annuels sont annoncés (communiqué, 8-K) avant le dépôt du 10-K. La date de dépôt est donc prudente et non exacte : elle garantit l'absence de fuite, au prix d'un signal un peu tardif.
 
 ## 3. Partie 02 — covariance

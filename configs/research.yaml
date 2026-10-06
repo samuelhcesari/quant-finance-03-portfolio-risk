@@ -11,6 +11,7 @@ backtest:
   start: "2010-01-01"
   cost_bps: 10               # coût par unité de turnover, aller simple
   max_signal_age_days: 550   # un 10-K de plus de ~18 mois n'est plus un signal
+  max_direct_filing_lag_days: 120   # au-delà, l'exercice n'est connu que par un 10-K ultérieur (comparatif)
 
 # Profil Quality du Projet 1 (configs/screening/quality.yaml, v1.0) — recopié tel quel.
 quality_rules:

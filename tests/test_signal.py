@@ -75,3 +75,13 @@ def test_signal_expires_when_stale():
     dates = pd.to_datetime(["2022-03-01", "2023-06-01", "2024-06-03"])
     p = sg.asof_panel(sg.quality(sg.metrics(_fund()), RULES), dates, "avail_pit", max_age_days=550)
     assert p["AAA"].iloc[0] == 1.0 and p["AAA"].iloc[1] == 1.0 and np.isnan(p["AAA"].iloc[2])
+
+
+def test_an_old_year_first_seen_in_a_later_filing_never_overrides_a_newer_one():
+    """Cas réel d'EDGAR : l'exercice 2019 n'apparaît en XBRL que comme comparatif du 10-K 2021."""
+    f = _fund()
+    f.loc[0, "filed"] = pd.Timestamp("2022-02-20")        # 2019 connu seulement via le 10-K de 2021
+    f.loc[1, "pretax_income"] = -1.0                      # 2020 : hors Quality
+    q = sg.quality(sg.metrics(f), RULES)
+    p = sg.asof_panel(q, pd.to_datetime(["2021-06-01", "2022-06-01"]), "avail_pit", value="fiscal_year")
+    assert list(p["AAA"]) == [2020, 2021]

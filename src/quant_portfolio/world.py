@@ -59,8 +59,13 @@ def fetch(cfg: dict) -> None:  # pragma: no cover — accès réseau
     d = cfg["data"]
     with open(ROOT / d["universe"], encoding="utf-8") as f:
         tickers = sorted(t for v in yaml.safe_load(f)["sectors"].values() for t in v["tickers"])
-    px = yf.download(tickers, start="2005-01-01", auto_adjust=True, progress=False)["Close"]
+    px = yf.download(tickers, start="2005-01-01", auto_adjust=True, progress=False, threads=False)["Close"]
+    for t in [t for t in tickers if t not in px or px[t].notna().sum() == 0]:      # nouvel essai, un par un
+        px[t] = yf.Ticker(t).history(start="2005-01-01", auto_adjust=True)["Close"].tz_localize(None)
     px.index = px.index.tz_localize(None)
+    missing = [t for t in tickers if px[t].notna().sum() == 0]
+    if missing:
+        raise SystemExit(f"prix introuvables pour {missing}")
     Path(ROOT / d["prices"]).parent.mkdir(exist_ok=True)
     px.to_csv(ROOT / d["prices"])
     print(f"prix : {px.shape[1]} tickers, {px.index[0].date()} -> {px.index[-1].date()}")
@@ -74,7 +79,7 @@ def fetch(cfg: dict) -> None:  # pragma: no cover — accès réseau
         df = pd.read_csv(io.StringIO("\n".join(lines)), index_col=0)
         df.index = pd.to_datetime(df.index.astype(str), format="%Y%m%d")
         frames.append(df.rename(columns=lambda c: c.strip()) / 100.0)
-    ff = pd.concat(frames, axis=1).dropna().rename(columns={"Mkt-RF": "MKT", "Mom": "MOM"})
+    ff = pd.concat(frames, axis=1, sort=True).dropna().rename(columns={"Mkt-RF": "MKT", "Mom": "MOM"})
     ff.to_csv(ROOT / d["factors"])
     print(f"facteurs : {list(ff.columns)}, {ff.index[0].date()} -> {ff.index[-1].date()}")
 

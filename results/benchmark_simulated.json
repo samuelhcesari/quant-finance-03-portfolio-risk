@@ -14,6 +14,7 @@
       "p10": 38.0,
       "p90": 72.0
     },
+    "share_known_only_from_later_filing": 0.0,
     "decisions_using_unpublished_info": 0.012449098312972659,
     "active_return": {
       "naive": -0.0015101704059007563,

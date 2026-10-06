@@ -76,7 +76,9 @@ def fig_filing_gap(o: dict, world: str) -> None:
     p, w = o["p1"], o["world"]
     m, R = p["metrics"], w.returns
     prev = m.groupby("ticker").quality.shift()
-    enters = m[(m.quality == 1) & (prev == 0) & (m.filed < R.index[-40]) & (m.period_end_date > R.index[40])]
+    enters = m[(m.quality == 1) & (prev == 0) & (m.filed < R.index[-40]) & (m.period_end_date > R.index[40]) & (m.filing_lag <= p["lag"].max())]
+    enters = enters[[w.prices[t].iloc[R.index.searchsorted(e) - 30: R.index.searchsorted(f) + 31].notna().all()
+                     for t, e, f in zip(enters.ticker, enters.period_end_date, enters.filed)]]
     ab = R.sub(R.mean(axis=1), axis=0)
     move = [ab[t].iloc[ab.index.searchsorted(f)] for t, f in zip(enters.ticker, enters.filed)]
     ex = enters.iloc[int(np.nanargmax(move))]

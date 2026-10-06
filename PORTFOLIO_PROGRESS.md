@@ -46,15 +46,19 @@ Ce projet clôt la série : le Projet 1/3 (`quant-finance-01-pipeline`, SQL) pro
 
 ## Figures et tests
 
-- [x] 18 figures dans `results/figures/simulated/`, dont une fiche de synthèse. Titres calculés à partir des résultats, pas écrits à la main.
-- [x] 27 tests, tous passent.
+- [x] 18 figures par monde (`results/figures/simulated/` et `results/figures/real/`), dont une fiche de synthèse. Titres calculés à partir des résultats, pas écrits à la main.
+- [x] 28 tests, tous passent (`pytest`).
 - [x] Bug trouvé par les tests : la prime Quality optionnelle de la simulation était versée aux mauvais titres (colonnes dans un ordre différent). Corrigé ; le test de récupération de la prime passe.
 
 ## Données réelles
 
-- [ ] `make fetch` : prix ajustés Yahoo depuis 2005 et facteurs Fama-French. **Écrit, pas encore exécuté.**
-- [ ] `make real` : les quatre parties sur les 43 entreprises du Projet 1.
-- [ ] Section « Résultats réels » du README, à rédiger d'après `results/benchmark_real.json`.
+- [x] `make fetch` : 43 tickers de prix ajustés Yahoo (2005-01-03 -> 2026-10-06), facteurs Fama-French 5 + momentum (-> 2026-08-31). Un ticker (BLDR) échouait en téléchargement groupé : nouvel essai titre par titre ajouté.
+- [x] Cohérence avec le Projet 1 : 107 exercices Quality sur 714, ROIC d'Apple 42,1 % (2020) et 87,4 % (2025) — identiques à ses chiffres publiés.
+- [x] Cas réel absent de la simulation : 13 % des exercices (surtout 2007-2009) ne sont connus en XBRL que par un 10-K ultérieur. Règle ajoutée dans `asof_panel` (un exercice ancien ne remplace jamais un plus récent déjà connu) + test dédié ; ces lignes sont exclues de l'étude d'événement.
+- [x] 01 : écart naïf − daté +0,38 %/an (t = 0,43) ; jour du dépôt +0,3 % / −0,5 %.
+- [x] 02 : 32 valeurs propres sur 36 dans le bruit ; à 63 jours, volatilité réalisée 23,6 % (empirique) contre 15,3 % (Ledoit-Wolf et Marchenko-Pastur).
+- [x] 03 : alpha −1,6 %/an, IC 95 % [−7,8 ; +4,1], Sharpe déflaté 12 %, alpha détectable 7,8 %/an ; exposition RMW +0,16 (t = 4,9).
+- [x] 04 : persistance GARCH 0,960 ; seule la VaR filtrée passe Kupiec et Christoffersen à 95 % et 99 %.
 
 ## Choix de dépendances
 

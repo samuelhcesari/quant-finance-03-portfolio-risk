@@ -42,6 +42,7 @@ def metrics(fund: pd.DataFrame) -> pd.DataFrame:
 
     f["avail_naive"] = f.period_end_date
     f["avail_pit"] = f.filed + pd.offsets.BDay(1)
+    f["filing_lag"] = (f.filed - f.period_end_date).dt.days
     return f
 
 
@@ -59,22 +60,27 @@ def asof_panel(m: pd.DataFrame, dates: pd.DatetimeIndex, avail: str, value: str 
     left = pd.DataFrame({"date": pd.DatetimeIndex(dates).as_unit("ns")})
     out = {}
     for tkr, d in m.dropna(subset=[avail]).groupby("ticker"):
-        d = d.assign(**{avail: d[avail].dt.as_unit("ns")}).sort_values(avail)
+        d = d.assign(**{avail: d[avail].dt.as_unit("ns")}).sort_values([avail, "period_end_date"])
+        # Un exercice ancien peut n'apparaître en XBRL que comme comparatif d'un 10-K
+        # ultérieur : il ne doit jamais remplacer un exercice plus récent déjà connu.
+        d = d[d.period_end_date >= d.period_end_date.cummax()]
         out[tkr] = pd.merge_asof(left, d[[avail, value]], left_on="date", right_on=avail,
                                  tolerance=pd.Timedelta(days=max_age_days))[value].values
     return pd.DataFrame(out, index=dates)
 
 
-def event_study(m: pd.DataFrame, abnormal: pd.DataFrame, window: int = 20) -> pd.DataFrame:
+def event_study(m: pd.DataFrame, abnormal: pd.DataFrame, window: int = 20, max_lag: int = 120) -> pd.DataFrame:
     """Rendement anormal cumulé moyen autour du dépôt, selon que l'entreprise
-    ENTRE dans le profil Quality, en SORT, ou ne change pas. Jour 0 = dépôt."""
+    ENTRE dans le profil Quality, en SORT, ou ne change pas. Jour 0 = dépôt.
+    Les exercices connus seulement par un 10-K ultérieur (`filing_lag > max_lag`)
+    sont écartés : leur date de dépôt n'est pas celle d'une annonce."""
     prev = m.groupby("ticker").quality.shift()
     kind = np.select([(m.quality == 1) & (prev == 0), (m.quality == 0) & (prev == 1)], ["entre", "sort"], "inchangé")
     kind = pd.Series(kind, index=m.index).where(prev.notna())
     paths: dict[str, list] = {"entre": [], "sort": [], "inchangé": []}
     idx = abnormal.index
-    for tkr, filed, k in zip(m.ticker, m.filed, kind):
-        if k is None or pd.isna(k) or tkr not in abnormal:
+    for tkr, filed, k, lag in zip(m.ticker, m.filed, kind, m.filing_lag):
+        if k is None or pd.isna(k) or tkr not in abnormal or lag > max_lag:
             continue
         p = idx.searchsorted(filed)
         seg = abnormal[tkr].values[p - window: p + window + 1] if p - window >= 0 else []
