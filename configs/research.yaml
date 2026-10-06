@@ -1,0 +1,53 @@
+# Paramètres de recherche — fixés AVANT de regarder les résultats (docs/methodology.md, section 1).
+seed: 0                    # monde illustré = premier de la famille des mondes simulés (graines 0..n_worlds-1)
+
+data:                      # monde "real" uniquement
+  fundamentals: ../quant-finance-01-pipeline/data/processed/financials_annual.csv
+  universe: ../quant-finance-01-pipeline/configs/company_universe.yaml
+  prices: data/prices.csv              # produit par `make fetch`
+  factors: data/ff_factors_daily.csv   # produit par `make fetch`
+
+backtest:
+  start: "2010-01-01"
+  cost_bps: 10               # coût par unité de turnover, aller simple
+  max_signal_age_days: 550   # un 10-K de plus de ~18 mois n'est plus un signal
+
+# Profil Quality du Projet 1 (configs/screening/quality.yaml, v1.0) — recopié tel quel.
+quality_rules:
+  - [roic, ">=", 0.15]
+  - [years_available_for_avg, "==", 3]
+  - [ebitda_margin_3y_avg, ">=", 0.20]
+  - [net_debt_to_ebitda, "<=", 2.0]
+  - [revenue_growth_3y_avg, ">=", 0.0]
+
+covariance:
+  window_days: 252
+  q_grid: [0.1, 0.25, 0.5, 0.75, 0.9]   # q = N / T
+  n_rep: 40
+  walk_windows: [63, 126, 252]   # jours d'estimation du backtest à variance minimale
+
+inference:
+  n_boot: 2000
+  block_days: 21
+  n_random: 1000             # stratégies aléatoires sans alpha
+  cost_grid_bps: [0, 5, 10, 20, 35, 50]
+
+risk:
+  alphas: [0.05, 0.01]
+  min_window: 750
+  refit_every: 63
+  hs_window: 500
+  n_recovery: 20             # séries GARCH simulées pour vérifier l'estimateur
+
+simulation:
+  n_per_sector: 15
+  sectors: [pharma, tech, construction]
+  start: "2008-01-01"
+  end: "2025-12-31"
+  first_fiscal_year: 2004
+  market: {mu: 0.07, vol: 0.16, alpha: 0.06, beta: 0.92, df: 8}   # GARCH(1,1), innovations Student
+  sector_vol: 0.08
+  rf: 0.02
+  filing_jump: 0.04          # rendement le jour du dépôt pour 1 écart-type de surprise
+  n_worlds: 200              # mondes indépendants pour la validation de la partie 01
+  quality_premium: 0.0       # alpha VRAI du profil Quality (par an) — nul par défaut

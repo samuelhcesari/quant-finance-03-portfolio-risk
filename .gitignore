@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Données téléchargées (make fetch) — jamais committées
+data/*
+!data/.gitkeep
+
+# Résultats : les figures et les JSON de chiffres sont committés volontairement,
+# pour être lisibles sur GitHub sans exécuter le pipeline.
+results/*
+!results/figures/
+!results/benchmark_*.json
+
+.env
+.DS_Store
