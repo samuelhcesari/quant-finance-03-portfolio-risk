@@ -7,9 +7,12 @@ venv/
 .pytest_cache/
 .ruff_cache/
 
-# Données téléchargées (make fetch) — jamais committées
+# Données : les états financiers (SEC, domaine public) et les facteurs Fama-French
+# sont committés ; les prix Yahoo (make fetch) ne sont pas redistribuables.
 data/*
-!data/.gitkeep
+!data/financials_annual.csv
+!data/ff_factors_daily.csv
+!data/README.md
 
 # Résultats : les figures et les JSON de chiffres sont committés volontairement,
 # pour être lisibles sur GitHub sans exécuter le pipeline.

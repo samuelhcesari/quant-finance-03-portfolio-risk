@@ -5,7 +5,7 @@ de valider chaque méthode sur un monde où la vérité est connue (`simulate.py
 avant de l'appliquer aux données du Projet 1.
 
 Monde réel :
-    make fetch                      # prix ajustés (Yahoo) + facteurs Fama-French
+    make fetch                      # prix ajustés (Yahoo) ; rafraîchit aussi les facteurs
     python -m quant_portfolio.run --world real
 """
 
@@ -47,9 +47,9 @@ def load_real(cfg: dict) -> World:
 
 
 def fetch(cfg: dict) -> None:  # pragma: no cover — accès réseau
-    """Télécharge les deux entrées que le Projet 1 ne fournit pas : un historique
-    de prix long et AJUSTÉ des dividendes (le Projet 1 garde 5 ans de clôtures
-    brutes), et les facteurs Fama-French quotidiens."""
+    """Télécharge ce que le Projet 1 ne fournit pas : un historique de prix long et
+    AJUSTÉ des dividendes (le Projet 1 garde 5 ans de clôtures brutes), non
+    redistribuable donc jamais committé, et rafraîchit les facteurs Fama-French."""
     import io
     import urllib.request
     import zipfile
@@ -79,7 +79,7 @@ def fetch(cfg: dict) -> None:  # pragma: no cover — accès réseau
         df = pd.read_csv(io.StringIO("\n".join(lines)), index_col=0)
         df.index = pd.to_datetime(df.index.astype(str), format="%Y%m%d")
         frames.append(df.rename(columns=lambda c: c.strip()) / 100.0)
-    ff = pd.concat(frames, axis=1, sort=True).dropna().rename(columns={"Mkt-RF": "MKT", "Mom": "MOM"})
+    ff = pd.concat(frames, axis=1, sort=True).dropna().rename(columns={"Mkt-RF": "MKT", "Mom": "MOM"}).loc["2005":]
     ff.to_csv(ROOT / d["factors"])
     print(f"facteurs : {list(ff.columns)}, {ff.index[0].date()} -> {ff.index[-1].date()}")
 

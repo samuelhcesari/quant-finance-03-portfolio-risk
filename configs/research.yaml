@@ -2,10 +2,10 @@
 seed: 0                    # monde illustré = premier de la famille des mondes simulés (graines 0..n_worlds-1)
 
 data:                      # monde "real" uniquement
-  fundamentals: ../quant-finance-01-pipeline/data/processed/financials_annual.csv
-  universe: ../quant-finance-01-pipeline/configs/company_universe.yaml
-  prices: data/prices.csv              # produit par `make fetch`
-  factors: data/ff_factors_daily.csv   # produit par `make fetch`
+  fundamentals: data/financials_annual.csv   # sortie du Projet 1 (SEC EDGAR), copie committée
+  universe: configs/universe.yaml
+  factors: data/ff_factors_daily.csv         # Kenneth French Data Library, copie committée
+  prices: data/prices.csv                    # produit par `make fetch` (non redistribuable)
 
 backtest:
   start: "2010-01-01"

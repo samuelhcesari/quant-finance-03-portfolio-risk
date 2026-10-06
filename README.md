@@ -29,11 +29,13 @@ Le portefeuille principal (équipondéré), le coût (10 pb) et les trois varian
 
 ## Data
 
-| Source | Contenu | Usage |
-|---|---|---|
-| Projet 1 (`financials_annual.csv`, SEC EDGAR) | 714 exercices, 43 entreprises, avec date de dépôt | signal Quality |
-| Yahoo Finance (`make fetch`) | clôtures ajustées quotidiennes depuis 2005 | rendements |
-| Kenneth French Data Library (`make fetch`) | 5 facteurs Fama-French + momentum, quotidiens | régression factorielle |
+| Source | Contenu | Usage | Dans le dépôt |
+|---|---|---|---|
+| Projet 1 (`financials_annual.csv`, SEC EDGAR) | 714 exercices, 43 entreprises, avec date de dépôt | signal Quality | oui |
+| Kenneth French Data Library | 5 facteurs Fama-French + momentum, quotidiens | régression factorielle | oui |
+| Yahoo Finance | clôtures ajustées quotidiennes depuis 2005 | rendements | non — `make fetch` |
+
+Les prix Yahoo ne sont pas redistribuables et restent donc à télécharger ; le reste est dans [`data/`](data/README.md).
 
 Les ratios sont recalculés en pandas à partir du fichier du Projet 1 et **retombent sur ses chiffres publiés** : 107 exercices sur 714 passent le profil Quality, ROIC d'Apple de 42,1 % en 2020 et 87,4 % en 2025.
 
@@ -222,10 +224,10 @@ make simulated   # 4 parties, 200 mondes, 18 figures — environ 2 minutes, aucu
 make test        # 28 tests
 ```
 
-Données réelles — le Projet 1 doit être cloné dans le dossier voisin et son pipeline déjà exécuté (`data/processed/financials_annual.csv`) :
+Données réelles — les états financiers et les facteurs sont dans le dépôt, seuls les prix sont à télécharger :
 
 ```
-make fetch       # prix ajustés (Yahoo) + facteurs Fama-French
+make fetch       # prix ajustés (Yahoo), moins d'une minute
 make real        # results/benchmark_real.json et results/figures/real/
 ```
 

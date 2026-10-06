@@ -1,0 +1,11 @@
+# Univers du Projet 1 (configs/company_universe.yaml) : 43 entreprises US, 3 secteurs.
+sectors:
+  pharma:
+    label: "Pharmaceutique / Biotech"
+    tickers: [PFE, JNJ, MRK, LLY, ABBV, BMY, AMGN, GILD, REGN, VRTX, MRNA, BIIB, ZTS, VTRS]
+  tech:
+    label: "Technologie"
+    tickers: [AAPL, MSFT, GOOGL, AMZN, META, NVDA, CRM, ADBE, ORCL, CSCO, IBM, INTC, TXN, NOW, PANW]
+  construction:
+    label: "Construction / Matériaux / E&C"
+    tickers: [CAT, VMC, MLM, DHI, LEN, PHM, FLR, J, PWR, ACM, MAS, BLDR, SHW, EXP]

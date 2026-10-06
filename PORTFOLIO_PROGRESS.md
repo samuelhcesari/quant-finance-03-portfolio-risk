@@ -53,6 +53,7 @@ Ce projet clôt la série : le Projet 1/3 (`quant-finance-01-pipeline`, SQL) pro
 ## Données réelles
 
 - [x] `make fetch` : 43 tickers de prix ajustés Yahoo (2005-01-03 -> 2026-10-06), facteurs Fama-French 5 + momentum (-> 2026-08-31). Un ticker (BLDR) échouait en téléchargement groupé : nouvel essai titre par titre ajouté.
+- [x] Projet autonome : états financiers du Projet 1 et facteurs Fama-French committés dans `data/`, univers dans `configs/universe.yaml` ; seuls les prix Yahoo (non redistribuables) restent à télécharger.
 - [x] Cohérence avec le Projet 1 : 107 exercices Quality sur 714, ROIC d'Apple 42,1 % (2020) et 87,4 % (2025) — identiques à ses chiffres publiés.
 - [x] Cas réel absent de la simulation : 13 % des exercices (surtout 2007-2009) ne sont connus en XBRL que par un 10-K ultérieur. Règle ajoutée dans `asof_panel` (un exercice ancien ne remplace jamais un plus récent déjà connu) + test dédié ; ces lignes sont exclues de l'étude d'événement.
 - [x] 01 : écart naïf − daté +0,38 %/an (t = 0,43) ; jour du dépôt +0,3 % / −0,5 %.

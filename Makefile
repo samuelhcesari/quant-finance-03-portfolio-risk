@@ -8,7 +8,7 @@ install:
 simulated:
 	python -m quant_portfolio.run --world simulated
 
-# --- Données réelles : nécessite le Projet 1 cloné à côté et déjà exécuté -----
+# --- Données réelles : seuls les prix sont à télécharger ----------------------
 fetch:
 	python -m quant_portfolio.world
 
